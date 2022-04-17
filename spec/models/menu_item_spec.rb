@@ -38,7 +38,14 @@ RSpec.describe MenuItem, type: :model do
       expect(menuItem).to be_invalid
       expect(menuItem.errors[:description]).to include("is too long (maximum is 150 characters)")
     end
-    pending "add test for having at least one category"
+    
+    it 'is must have at least one category' do
+      category = FactoryBot.create(:category)
+      menuItem = FactoryBot.build(:menu_item)
+      
+      expect(menuItem).to be_invalid
+      expect(food.errors[:category]).to include('must exist')
+    end
 
   end
 end
