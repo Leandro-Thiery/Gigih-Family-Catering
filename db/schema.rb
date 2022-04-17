@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 2022_04_17_171500) do
   end
 
   create_table "item_categories", force: :cascade do |t|
-    t.integer "item_id"
+    t.integer "menu_item_id"
     t.integer "category_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
