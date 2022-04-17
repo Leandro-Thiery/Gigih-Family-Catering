@@ -30,11 +30,13 @@ RSpec.describe MenuItem, type: :model do
     it 'is invalid with a price less than 0.01' do
       menuItem = FactoryBot.build(:menu_item, price: 0.009)
       expect(menuItem).to be_invalid
+      expect(menuItem.errors[:price]).to include("must be greater than or equal to 0.01")
     end
 
     it 'is invalid with a description more than 150 characters' do
       menuItem = FactoryBot.build(:menu_item, description: Faker::String.random(length: 151))
       expect(menuItem).to be_invalid
+      expect(menuItem.errors[:description]).to include("is too long (maximum is 150 characters)")
     end
     pending "add test for having at least one category"
 
