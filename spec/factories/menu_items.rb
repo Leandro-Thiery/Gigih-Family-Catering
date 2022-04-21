@@ -4,4 +4,8 @@ FactoryBot.define do
     price { 15000.0 }
     description { Faker::Food.description[0..149] }
   end
+  factory :invalid_menu_item, parent: :menu_item do
+    name { nil }
+    price { nil }
+  end
 end

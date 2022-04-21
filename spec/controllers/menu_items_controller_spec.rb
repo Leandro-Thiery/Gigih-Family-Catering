@@ -60,6 +60,77 @@ RSpec.describe MenuItemsController, type: :controller do
         expect { post :create, params: { menu_item: attributes_for(:menu_item) } }
           .to change(MenuItem, :count).by(1)
       end
+
+      it 'redirects to menu_items#show' do
+        post :create, params: { menu_item: attributes_for(:menu_item) }
+        expect(response).to redirect_to(menu_items_path)
+      end
+    end
+
+    context 'with invalid attributes' do
+      it 'does not add new menu item db' do
+        expect { post :create, params: { menu_item: attributes_for(:invalid_menu_item) } }
+          .not_to change(MenuItem, :count)
+      end
+
+      it 're-renders the :edit template' do
+        post :create, params: { menu_item: attributes_for(:invalid_menu_item) }
+        expect(response).to render_template :new
+      end
+    end
+  end
+
+  describe 'PATCH #update' do
+    before :each do
+      @menu_item = FactoryBot.create(:menu_item)
+    end
+    context 'with valid attributes' do
+      it 'locates the menu item' do
+        patch :update, params: { id: @menu_item, menu_item: attributes_for(:menu_item) }
+        expect(assigns(:menu_item)).to eq(@menu_item)
+      end
+
+      it 'changes @menu_item ' do
+        updated_menu_item = attributes_for(:menu_item, name: 'Fried Chicken')
+        patch :update, params: {id: @menu_item, menu_item: updated_menu_item }
+        @menu_item.reload
+        expect(@menu_item.name).to eq('Fried Chicken')
+      end
+
+      it 'redirects to menu_items#show' do
+        patch :update, params: { id: @menu_item, menu_item: attributes_for(:menu_item) }
+        expect(response).to redirect_to(@menu_item)
+      end
+    end
+
+    context 'with invalid attributes' do
+      it 'does not add edited menu item db' do
+        @menu_item = FactoryBot.create(:menu_item, name:'Fried Chicken')
+        patch :update, params: {id: @menu_item, menu_item: attributes_for(:invalid_menu_item) }
+        expect(@menu_item.name).to eq('Fried Chicken')
+      end
+
+      it 're-renders the :edit template' do
+        patch :update, params: {id: @menu_item, menu_item: attributes_for(:invalid_menu_item) }
+        expect(response).to render_template :edit
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    before :each do
+      @menu_item = FactoryBot.create(:menu_item)
+    end
+
+    it "deletes the food from the database" do
+      expect{
+        delete :destroy, params: { id: @menu_item }
+      }.to change(MenuItem, :count).by(-1)
+    end
+
+    it "redirects to foods#index" do
+      delete :destroy, params: { id: @menu_item }
+      expect(response).to redirect_to menu_items_path
     end
   end
 
