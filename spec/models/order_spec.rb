@@ -18,16 +18,4 @@ RSpec.describe Order, type: :model do
     expect(order).to be_invalid
     expect(order.errors[:total]).to include("is not a number")
   end
-
-  describe "self#by_letter" do
-    context "with matching letter" do
-      it "should return a sorted array of results that match" do
-        order1 = FactoryBot.create(:order, name: "Nasi Uduk")
-        order2 = FactoryBot.create(:order, name: "Kerak Telor")
-        order3 = FactoryBot.create(:order, name: "Nasi Semur Jengkol")
-
-        expect(order.by_letter("N")).to eq([order3, order1])
-      end
-    end
-  end
 end

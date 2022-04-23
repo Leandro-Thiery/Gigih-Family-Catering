@@ -6,16 +6,29 @@ RSpec.describe OrdersController, type: :controller do
   end
 
   describe "GET #index" do
-    context "with filters" do
+    context "with email filter" do
       it "assigns the filtered orders to @orders" do
         order = FactoryBot.create(:order)
-        get :index, params: { id: order }
+        get :index, params: { email: @customer[:email] }
         expect(assigns(:orders)).to match_array([order])
       end
-      it "assigns nothing to @orders for filters with no match" do
+      it "assigns nothing to @orders for filter with no match" do
         order = FactoryBot.create(:order)
-        get :index, params: { id: order }
+        get :index, params: { email: "nama@domain.com" }
+        expect(assigns(:orders)).to match_array([])
+      end
+    end
+
+    context "with price filter" do
+      it "assigns the filtered orders to @orders" do
+        order = FactoryBot.create(:order)
+        get :index, params: { min_price: 25000.0, max_price: 35000.0 }
         expect(assigns(:orders)).to match_array([order])
+      end
+      it "assigns nothing to @orders for filter with no match" do
+        order = FactoryBot.create(:order)
+        get :index, params: { min_price: 35000.0 }
+        expect(assigns(:orders)).to match_array([])
       end
     end
 
@@ -82,19 +95,19 @@ RSpec.describe OrdersController, type: :controller do
 
       it "saves the new menu item in db" do
         expect {
-          post :create, params: { order: attributes_for(:order),
+          post :create, params: { customer_id: @customer.id,
                                   details: [{ "menu_item_id" => "1", "quantity" => "2" }] }
         }.to change(Order, :count).by(1).and change(OrderDetail, :count).by(1)
       end
 
       it "calculate the correct total price" do
-        post :create, params: { order: attributes_for(:order),
+        post :create, params: { customer_id: @customer.id,
                                 details: [{ "menu_item_id" => "1", "quantity" => "2" }] }
         expect(assigns(:order)[:total]).to eq(30000.0)
       end
 
       it "redirects to orders#show" do
-        post :create, params: { order: attributes_for(:order),
+        post :create, params: { customer_id: @customer.id,
                                 details: [{ "menu_item_id" => "1", "quantity" => "2" }] }
         expect(response).to redirect_to(orders_path)
       end
@@ -105,9 +118,10 @@ RSpec.describe OrdersController, type: :controller do
         expect { post :create, params: { order: attributes_for(:invalid_order) } }.not_to change(Order, :count)
       end
 
-      it "re-renders the :edit template" do
+      it "return json response" do
         post :create, params: { order: attributes_for(:invalid_order) }
-        expect(response).to render_template :new
+        json_body = JSON.parse(response.body)
+        expect(json_body["customer_id"]).to include("can't be blank")
       end
     end
   end
@@ -125,13 +139,13 @@ RSpec.describe OrdersController, type: :controller do
 
       it "changes @order " do
         updated_order = attributes_for(:order, status: "PAID")
-        patch :update, params: { id: @order, order: updated_order }
+        patch :update, params: { id: @order, status: "PAID" }
         @order.reload
         expect(@order[:status]).to eq("PAID")
       end
 
       it "redirects to orders#show" do
-        patch :update, params: { id: @order, order: attributes_for(:order) }
+        patch :update, params: { id: @order, status: "PAID" }
         expect(response).to redirect_to(@order)
       end
     end
@@ -139,13 +153,14 @@ RSpec.describe OrdersController, type: :controller do
     context "with invalid attributes" do
       it "does not add edited status to db" do
         @order = FactoryBot.create(:order, status: "CANCELED")
-        patch :update, params: { id: @order, order: attributes_for(:invalid_order, status: "FREE") }
+        patch :update, params: { id: @order, status: "FREE" }
         expect(@order[:status]).to eq("CANCELED")
       end
 
       it "re-renders the :edit template" do
-        patch :update, params: { id: @order, order: attributes_for(:invalid_order, status: "FREE") }
-        expect(response).to render_template :edit
+        patch :update, params: { id: @order, status: "FREE" }
+        json_body = JSON.parse(response.body)
+        expect(json_body["status"]).to include("is not included in the list")
       end
     end
   end

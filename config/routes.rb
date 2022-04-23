@@ -3,6 +3,6 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
-  resources :menu_items
-  resources :orders
+  resources :menu_items, defaults: { format: :json }
+  resources :orders, defaults: { format: :json }
 end

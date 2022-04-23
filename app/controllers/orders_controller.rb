@@ -1,6 +1,11 @@
 class OrdersController < ApplicationController
   def index
-    @orders = Order.include(:customer).where("email = ?", params[:email])
+    @orders = Order.all
+    @orders = @orders.filter_by_email(params[:email]) if params[:email].present?
+    @orders = @orders.filter_by_min_price(params[:min_price]) if params[:min_price].present?
+    @orders = @orders.filter_by_max_price(params[:max_price]) if params[:max_price].present?
+    @orders = @orders.filter_by_start_date(params[:start_date]) if params[:start_date].present?
+    @orders = @orders.filter_by_end_date(params[:end_date]) if params[:end_date].present?
   end
 
   def show
@@ -17,8 +22,7 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = Order.new(order_params)
-
+    @order = Order.new(customer_id: params[:customer_id])
     if @order.save && !params[:details].nil?
       total = 0
       params[:details].each do |order_detail|
@@ -30,33 +34,24 @@ class OrdersController < ApplicationController
         if detail.save
           total += item_price * order_detail[:quantity].to_i
         else
-          render :new, status: :unprocessable_entity
+          render json: detail.errors, status: :unprocessable_entity
         end
       end
 
       @order.update(total: total)
       redirect_to orders_path
     else
-      render :new, status: :unprocessable_entity
+      render json: @order.errors, status: :unprocessable_entity
     end
   end
 
   def update
     @order = Order.find(params[:id])
-    if @order.update(update_params)
+    if @order.update(status: params[:status])
       redirect_to order_path
     else
-      render :edit, status: :unprocessable_entity
+      puts @order.errors.to_hash
+      render json: @order.errors, status: :unprocessable_entity
     end
-  end
-
-  private
-
-  def order_params
-    params.require(:order).permit(:customer_id)
-  end
-
-  def update_params
-    params.require(:order).permit(:status)
   end
 end
