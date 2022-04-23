@@ -10,7 +10,6 @@ class OrdersController < ApplicationController
 
   def show
     @order = Order.find(params[:id])
-    puts @order.order_details
   end
 
   def new
@@ -50,7 +49,6 @@ class OrdersController < ApplicationController
     if @order.update(status: params[:status])
       redirect_to order_path
     else
-      puts @order.errors.to_hash
       render json: @order.errors, status: :unprocessable_entity
     end
   end
