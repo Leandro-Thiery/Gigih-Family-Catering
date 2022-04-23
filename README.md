@@ -1,25 +1,196 @@
-# Rails on Replit
+# Gigih Family Catering
 
-This is a template to get you started with Rails on Replit. It's ready to go so you can just hit run and start coding!
+**Name** : Leandro Thiery
 
-This template was generated using `rails new` (after you install the `rails` gem from the packager sidebar) so you can always do that if you prefer to set it up from scratch. The only had two make config changes we had to make to run it on Replit:
+**ID** : P_G2BE2058
 
-- bind the app on `0.0.0.0` instead of `localhost` (see `.replit`)
-- allow `*.repl.co` hosts (see `config/environments/development.rb`)
-- allow the app to be iframed on `replit.com` (see `config/application.rb`)
+## Important Notes:
 
-## Running the app
+- This rails project doesn’t use the views **yet**, so response will be returned in JSON
 
-Simple hit run! You can edit the run command from the `.replit` file.
+## API List:
 
-## Running commands
+### Category
 
-Start every command with `bundle exec` so that it runs in the context of the installed gems environment. The console pane will give you output from the server but you can run arbitrary command from the shell without stopping the server.
+**URL** : `/categories/`
 
-## Database
+**Method** : `GET`
 
-SQLite would work in development but we don't recommend running it in production. Instead look into using the built-in [Replit database](http://docs.replit.com/misc/database). Otherwise you are welcome to connect databases from your favorite provider. 
+**Data example**
 
-## Help
+```json
+{
+    "categories": [
+        {
+            "id": 1,
+            "name": "Makanan"
+        },
+        {
+            "id": 2,
+            "name": "Minuman"
+        },
+        {
+            "id": 3,
+            "name": "Lokal"
+        }
+    ]
+}
+```
 
-If you need help you might be able to find an answer on our [docs](https://docs.replit.com) page. Alternatively you can [ask in the community](https://replit.com/talk/ask). Feel free to report bugs [here](https://replit.com/bugs) and give us feedback [here](https://Replit/feedback).
+**URL** : `/categories/:id`
+
+**Method** : `GET`
+
+**Data example**
+
+```json
+{
+    "id": 1,
+    "name": "Makanan"
+}
+```
+
+### MenuItems
+
+**URL** : `/menu_items/`
+
+**Method** : `GET`
+
+**Data example**
+
+```json
+{
+    "menu_items": [
+        {
+            "id": 1,
+            "name": "Nasi Uduk",
+            "price": 10000.0,
+            "description": null
+        },
+        {
+            "id": 2,
+            "name": "Es Teh",
+            "price": 5000.0,
+            "description": null
+        }
+    ]
+}
+```
+
+**URL** : `/menu_items/:id`
+
+**Method** : `GET`
+
+**Data example**
+
+```json
+{
+    "id": 1,
+    "name": "Nasi Uduk",
+    "price": 10000.0,
+    "description": null,
+    "categories": [
+        "Makanan",
+        "Lokal"
+    ]
+}
+```
+
+### Orders
+
+**URL** : `/orders/`
+
+**Method** : `GET`
+
+**Data example**
+
+```json
+{
+    "orders": [
+        {
+            "id": 1,
+            "total": 15000.0,
+            "status": "NEW",
+            "name": "Leandro",
+            "email": "leandro@gmail.com"
+        },
+        {
+            "id": 2,
+            "total": 20000.0,
+            "status": "NEW",
+            "name": "Thiery",
+            "email": "thiery@gmail.com"
+        }
+    ]
+}
+```
+
+**URL** : `/orders/`
+
+**Method** : `POST`
+
+**Body example**
+
+```json
+{
+    "customer_id": 1,
+    "details": [
+        {
+            "menu_item_id": 1,
+            "quantity": 1
+        },
+        {
+            "menu_item_id": 2,
+            "quantity": 2
+        },
+    ]
+}
+```
+
+**URL** : `/orders/:id`
+
+**Method** : `GET`
+
+**Data example**
+
+```json
+{
+    "id": 1,
+    "total": 15000.0,
+    "status": "NEW",
+    "name": "Leandro",
+    "email": "leandro@gmail.com",
+    "order_details": [
+        {
+            "item_name": "Nasi Uduk",
+            "categories": [
+                "Makanan",
+                "Lokal"
+            ],
+            "price": 10000.0,
+            "quantity": 1
+        },
+        {
+            "item_name": "Es Teh",
+            "categories": [
+                "Minuman"
+            ],
+            "price": 5000.0,
+            "quantity": 1
+        }
+    ]
+}
+```
+
+**URL** : `/orders/:id`
+
+**Method** : `PATCH`
+
+**Body example**
+
+```json
+{
+    "id": 1,
+    "status": "one of ['NEW', 'PAID', 'CANCELED']"
+}
+```
