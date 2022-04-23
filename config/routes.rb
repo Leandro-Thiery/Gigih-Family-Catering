@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   # root "articles#index"
   resources :menu_items, defaults: { format: :json }
   resources :orders, defaults: { format: :json }
+  resources :categories, defaults: {format: :json}
 end
