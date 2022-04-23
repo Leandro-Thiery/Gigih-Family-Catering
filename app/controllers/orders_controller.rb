@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
   def index
-    @orders = Order.all
+    @orders = Order.include(:customer).where("email = ?", params[:email])
   end
 
   def show
@@ -17,7 +17,6 @@ class OrdersController < ApplicationController
   end
 
   def create
-    # puts params
     @order = Order.new(order_params)
 
     if @order.save && !params[:details].nil?

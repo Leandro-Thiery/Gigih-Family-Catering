@@ -6,15 +6,30 @@ RSpec.describe OrdersController, type: :controller do
   end
 
   describe "GET #index" do
-    it "assigns the requested orders to @orders" do
-      order = FactoryBot.create(:order)
-      get :index
-      expect(assigns(:orders)).to match_array([order])
+    context "with filters" do
+      it "assigns the filtered orders to @orders" do
+        order = FactoryBot.create(:order)
+        get :index, params: { id: order }
+        expect(assigns(:orders)).to match_array([order])
+      end
+      it "assigns nothing to @orders for filters with no match" do
+        order = FactoryBot.create(:order)
+        get :index, params: { id: order }
+        expect(assigns(:orders)).to match_array([order])
+      end
     end
-    it "renders the :index template" do
-      order = FactoryBot.create(:order)
-      get :index
-      expect(response).to render_template :index
+
+    context "without filters" do
+      it "assigns the requested orders to @orders" do
+        order = FactoryBot.create(:order)
+        get :index
+        expect(assigns(:orders)).to match_array([order])
+      end
+      it "renders the :index template" do
+        order = FactoryBot.create(:order)
+        get :index
+        expect(response).to render_template :index
+      end
     end
   end
 
